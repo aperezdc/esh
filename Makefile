@@ -26,11 +26,13 @@ VERS := 0.8.5
 
 all: esh
 
+bold: bold.o
+
 esh: $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ $(LIB) -o esh
 
 clean:
-	$(RM) $(OBJS) esh
+	$(RM) $(OBJS) bold.o esh bold
 
 dist:
 	git archive --prefix=esh-$(VERS)/ v$(VERS) | xz -9c > esh-$(VERS).tar.xz
