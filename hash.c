@@ -1,9 +1,8 @@
-/* 
- * esh, the Unix shell with Lisp-like syntax. 
+/*
+ * esh, the Unix shell with Lisp-like syntax.
  * Copyright (C) 1999  Ivan Tkatchev
  * This source code is under the GPL.
  */
-
 
 
 #include <stdlib.h>
@@ -74,7 +73,7 @@ static void* hash_put_aux(hash_table* _hash_array, char* key, void* data,
 
   hs_ent->key = key;
   hs_ent->data = data;
-  
+
   (*_hash_array)[idx] = ls_cons(hs_ent, bucket);
 
   if (doinc) {
@@ -108,7 +107,7 @@ void* hash_get(hash_table* _hash_array, char* key) {
   list* iter;
 
   for (iter = bucket; iter != NULL; iter = ls_next(iter)) {
-    if (strcmp(((hash_entry*)ls_data(iter))->key, key) == 0) 
+    if (strcmp(((hash_entry*)ls_data(iter))->key, key) == 0)
       return ((hash_entry*)ls_data(iter))->data;
   }
 
@@ -119,7 +118,7 @@ void* hash_get(hash_table* _hash_array, char* key) {
  * Uglification alert.
  */
 static char* dynamic_strcpy(char* str) {
-  char* tmp = (char*)gc_alloc(sizeof(char) * (strlen(str) + 1), 
+  char* tmp = (char*)gc_alloc(sizeof(char) * (strlen(str) + 1),
                               "hash.c:dynamic_strcpy");
 
   strcpy(tmp, str);
@@ -147,7 +146,7 @@ void hash_init(hash_table* _hash_array, hash_entry data[]) {
   }
 }
 
-void hash_free(hash_table* tab, 
+void hash_free(hash_table* tab,
 	       void (*func)()) {
   int i;
   list* iter;
@@ -165,7 +164,7 @@ void hash_free(hash_table* tab,
     }
 
     ls_free((*tab)[i]);
-    
+
   }
 
   gc_free((*tab));

@@ -1,5 +1,5 @@
-/* 
- * esh, the Unix shell with Lisp-like syntax. 
+/*
+ * esh, the Unix shell with Lisp-like syntax.
  * Copyright (C) 1999  Ivan Tkatchev
  * This source code is under the GPL.
  */
@@ -109,7 +109,7 @@ void ls_free_all(list* ls) {
 
 void ls_free_shallow(list* ls) {
   if (!ls) return;
-  
+
   if (ls->next) {
     ls_free_shallow(ls->next);
   }
@@ -170,8 +170,6 @@ list* ls_copy(list* arg) {
       break;
     }
   }
-  
+
   return ret;
 }
-
-

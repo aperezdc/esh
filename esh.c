@@ -1,6 +1,5 @@
-
-/* 
- * esh, the Unix shell with Lisp-like syntax. 
+/*
+ * esh, the Unix shell with Lisp-like syntax.
  * Copyright (C) 1999  Ivan Tkatchev
  * This source code is under the GPL.
  */
@@ -119,7 +118,7 @@ int special(char c) {
 
     return 0;
 
-  } else if (openparen(c) || closeparen(c) || separator(c) || 
+  } else if (openparen(c) || closeparen(c) || separator(c) ||
 	     redirect_in(c) || redirect_out(c) || quote(c) ||
 	     literal(c) || delaysym(c) || comment(c) ||
 	     c == '\0') {
@@ -130,7 +129,7 @@ int special(char c) {
 }
 
 char* dynamic_strcpy(char* str) {
-  char* tmp = (char*)gc_alloc(sizeof(char) * (strlen(str) + 1), 
+  char* tmp = (char*)gc_alloc(sizeof(char) * (strlen(str) + 1),
 			      "dynamic_strcpy");
 
   strcpy(tmp, str);
@@ -141,10 +140,10 @@ char* dynamic_strcpy(char* str) {
 
 /*
  * The tokenizer. Useful, but quite limited. It does not detect numerals
- * or list literals. In fact, it only detects strings and special 
- * symbols. 
+ * or list literals. In fact, it only detects strings and special
+ * symbols.
  *
- * List literals are created by the parser, since they could well 
+ * List literals are created by the parser, since they could well
  * have special syntax.
  *
  * Detecting numerals is the job of the individual commands. This is
@@ -215,7 +214,7 @@ char next_token(char* input, int* i, char** token_value, int* len) {
       ret = foo;
       break;
     }
-    
+
     /* Find a word beginning. */
     if (!ignore && !currquote) {
 
@@ -250,7 +249,7 @@ char next_token(char* input, int* i, char** token_value, int* len) {
       if (j == (*len)-2) {
 	char* tmp = (char*)gc_alloc(sizeof(char) * (*len) * 2,
 				    "next_token");
-	
+
 	(*token_value)[(*len)-1] = '\0';
 	strcpy(tmp, (*token_value));
 
@@ -288,7 +287,7 @@ static void ls_strcat_aux(list* ls, char** buff, int* i, int* len) {
       foo = strlen(ls_data(iter));
 
       if ((*i) + foo >= ((*len)-1)) {
-	char* tmp = (char*)gc_alloc(sizeof(char) * (*len + foo) * 2, 
+	char* tmp = (char*)gc_alloc(sizeof(char) * (*len + foo) * 2,
 				    "ls_strcat_aux");
 
 	(*len) = (*len + foo) * 2;
@@ -297,7 +296,7 @@ static void ls_strcat_aux(list* ls, char** buff, int* i, int* len) {
 	gc_free((*buff));
 	(*buff) = tmp;
       }
-      
+
       strcat((*buff), ls_data(iter));
       (*i) += foo;
     }
@@ -311,7 +310,7 @@ char* ls_strcat(list* ls) {
   char* buff = (char*)gc_alloc(sizeof(char) * len, "ls_strcat");
 
   buff[0] = '\0';
-  
+
   ls_strcat_aux(ls, &buff, &i, &len);
 
   return buff;
@@ -344,7 +343,7 @@ glob_t* globbify(list* command) {
   }
 
   for (iter = alias; iter != NULL; iter = ls_next(iter)) {
-    
+
     glob(ls_data(iter), flags, NULL, ret);
 
     flags |= GLOB_APPEND;
@@ -380,7 +379,7 @@ void close_aux(int fd) {
   if (fd != STDIN_FILENO &&
       fd != STDOUT_FILENO &&
       fd != STDERR_FILENO) {
-    
+
     close(fd);
   }
 }
@@ -391,7 +390,7 @@ void dup2_aux(int old, int new) {
       error("esh: I/O redirection failed.");
       exit(EXIT_FAILURE);
     }
-    
+
     close_aux(old);
   }
 }
@@ -503,7 +502,7 @@ char* file_read(int fd) {
       gc_free(buff);
       buff = tmp;
     }
-    
+
     buff[i] = foo;
     i++;
   }
@@ -515,7 +514,7 @@ char* file_read(int fd) {
 
 void file_write(int fd, char* data) {
   int i = 0;
-  
+
   while (1) {
     if (!data[i]) break;
 
@@ -620,7 +619,7 @@ void show_status(job_t* job, int stat) {
       error_simple("Unknown signal %d", WTERMSIG(stat));
       break;
     }
-     
+
     error(")");
   }
 
@@ -698,7 +697,7 @@ void job_foreground(job_t* job) {
 
     if (job->status == JOB_STOPPED) {
       tcsetattr(shell_terminal_fd, TCSADRAIN, &job->terminal_modes);
-    
+
       if (kill(-job->pgid, SIGCONT) < 0) {
 	error("esh: could not continue PGID %d!", job->pgid);
 	return;
@@ -709,7 +708,7 @@ void job_foreground(job_t* job) {
       return;
     }
   }
-  
+
   job->status = JOB_RUNNING;
 
   job_wait(job);
@@ -745,7 +744,7 @@ void arrange_funeral(void) {
   list* jnew = NULL;
   list* iter;
   job_t* job;
-  
+
   int foo = 0;
 
   if (!interactive) {
@@ -760,7 +759,7 @@ void arrange_funeral(void) {
 
   for (iter = jobs; iter != NULL; iter = ls_next(iter)) {
     job = ls_data(iter);
-    
+
     if (job->status == JOB_DEAD) foo = 1;
   }
 
@@ -768,7 +767,7 @@ void arrange_funeral(void) {
 
   for (iter = jobs; iter != NULL; iter = ls_next(iter)) {
     job = ls_data(iter);
-    
+
     if (job->status == JOB_DEAD) {
       gc_free(job->name);
       gc_free(job);
@@ -790,7 +789,7 @@ pid_t do_pipe(int f_src, int f_out, list* ls, int bg, int destructive) {
   int pipes[2];
   int input_src = STDIN_FILENO;
   int output_sink;
-  
+
   glob_t* comm = NULL;
 
   job_t* job = NULL;
@@ -808,7 +807,7 @@ pid_t do_pipe(int f_src, int f_out, list* ls, int bg, int destructive) {
 
   if (ls == NULL) goto done;
 
-  
+
   for (i = 0; ls != NULL; ls = ls_next(ls), i++) {
 
     if (ls_type(ls) != TYPE_LIST) {
@@ -822,13 +821,13 @@ pid_t do_pipe(int f_src, int f_out, list* ls, int bg, int destructive) {
       error("esh: parse error: tried to execute a null command.");
       goto done;
 
-    } 
+    }
 
     if (!job->name) {
-      job->name = (char*)gc_alloc(sizeof(char) * 
+      job->name = (char*)gc_alloc(sizeof(char) *
 				(strlen(comm->gl_pathv[0])+1),
 				  "do_pipe");
-    
+
       strcpy(job->name, comm->gl_pathv[0]);
     }
 
@@ -844,8 +843,8 @@ pid_t do_pipe(int f_src, int f_out, list* ls, int bg, int destructive) {
     pid = fork_aux();
 
     if (pid == 0) {
-      
-      exec_aux(comm->gl_pathv, pgid, input_src, output_sink, 
+
+      exec_aux(comm->gl_pathv, pgid, input_src, output_sink,
 	       stderr_handler_fd);
 
     } else {
@@ -855,7 +854,7 @@ pid_t do_pipe(int f_src, int f_out, list* ls, int bg, int destructive) {
 
       setpgid(pid, pgid);
     }
-    
+
     globfree(comm);
     gc_free(comm);
     comm = NULL;
@@ -931,7 +930,7 @@ list* do_builtin(list* ls) {
     error("esh: command names are always strings.");
     return NULL;
   }
-  
+
   func = hash_get(builtins, ls_data(ls));
   foo = hash_get(defines, ls_data(ls));
 
@@ -1058,7 +1057,7 @@ list* parse_builtin(char* input, int* i, int liter, int delay) {
   gc_free(value);
 
   ls = ls_reverse(ls);
-  
+
   if (liter) {
     return ls;
 
@@ -1083,7 +1082,7 @@ list* parse_sequence(list* ret, char* input, int* i, char* tok) {
 				"parse_sequence");
   while (1) {
     (*tok) = next_token(input, i, &value, &len);
-  
+
     if (special(*tok)) {
       break;
 
@@ -1096,7 +1095,7 @@ list* parse_sequence(list* ret, char* input, int* i, char* tok) {
   }
 
   gc_free(value);
-  
+
   return ret;
 }
 
@@ -1113,7 +1112,7 @@ list* parse_split(char* input) {
 
   while (1) {
     ls = parse_sequence(ls, input, &i, &token);
-    
+
     if (!token) break;
 
     if (special(token)) {
@@ -1214,7 +1213,7 @@ void parse_pipe(char* input) {
       tmp2 = eval(alias);
       ls_free_all(stack);
       ls_free_all(tmp2);
-      
+
       stack = oldstack;
 
       goto done;
@@ -1395,7 +1394,7 @@ int parse_file(int file, char** buff, int* len) {
       did_one = 1;
       parencount--;
 
-    } 
+    }
 
     if (i >= (*len)-2) {
       char* tmp = (char*)gc_alloc(sizeof(char) * (*len) * 2, "parse_file");
@@ -1427,7 +1426,7 @@ int parse_file(int file, char** buff, int* len) {
 char* get_prompt(void) {
   char* ret;
   list* prompt_ev;
-  
+
   if (prompt) {
     prompt_ev = eval(prompt);
 
@@ -1475,7 +1474,7 @@ void do_file(char* fname, int do_error) {
 
   gc_free(buff);
 }
-  
+
 
 
 static void exception(int signum) {
@@ -1530,10 +1529,10 @@ void init_shell(int argc, char** argv) {
   ls_type_set(ls_void, TYPE_VOID);
 
   if (interactive) {
-  
+
     while (1) {
       pgid = getpgrp();
-    
+
       if (tcgetpgrp(shell_terminal_fd) == pgid) break;
 
       kill(-pgid, SIGTTIN);
@@ -1545,20 +1544,20 @@ void init_shell(int argc, char** argv) {
     signal(SIGTSTP, SIG_IGN);
     signal(SIGTTIN, SIG_IGN);
     signal(SIGTTOU, SIG_IGN);
-    
+
     signal(SIGCHLD, babysit);
 
     self_pid = getpid();
 
     if (setpgid(0, self_pid) < 0) {
       error("esh: could not put myself in my own process group.");
-      error("esh: %s.", 
+      error("esh: %s.",
             (errno == EINVAL ? "pgid < 0" :
             (errno == EPERM  ? "permission denied" :
-            (errno == ESRCH  ? "no such PID" : 
-            ("unknown error")))));             
+            (errno == ESRCH  ? "no such PID" :
+            ("unknown error")))));
     }
-    
+
     tcgetattr(shell_terminal_fd, &shell_terminal_modes);
 
     read_init();
@@ -1597,7 +1596,7 @@ int main(int argc, char** argv, char** env) {
     while (1) {
       exception_flag = 0;
       arrange_funeral();
-    
+
       pmt = get_prompt();
 
       line = read_read(pmt);
@@ -1615,7 +1614,7 @@ int main(int argc, char** argv, char** env) {
     do_file(NULL, 1);
   }
 
-  
+
   close_aux(stderr_handler_fd);
 
 #ifdef MEM_DEBUG

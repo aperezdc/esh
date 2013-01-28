@@ -1,5 +1,5 @@
-/* 
- * esh, the Unix shell with Lisp-like syntax. 
+/*
+ * esh, the Unix shell with Lisp-like syntax.
  * Copyright (C) 1999  Ivan Tkatchev
  * This source code is under the GPL.
  */
@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
     if (strcmp(flags[i], argv[1]) == 0) {
       flag = flags[i+1];
     }
-    
+
     i += 2;
   }
 
@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
     if (strcmp(colors[i], argv[2]) == 0) {
       color = colors[i+1];
     }
-    
+
     i += 2;
   }
 
@@ -87,5 +87,3 @@ int main(int argc, char** argv) {
 
   return EXIT_SUCCESS;
 }
-
-

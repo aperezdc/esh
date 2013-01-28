@@ -1,9 +1,8 @@
-/* 
- * esh, the Unix shell with Lisp-like syntax. 
+/*
+ * esh, the Unix shell with Lisp-like syntax.
  * Copyright (C) 1999  Ivan Tkatchev
  * This source code is under the GPL.
  */
-
 
 #ifndef _GC_H
 #define _GC_H

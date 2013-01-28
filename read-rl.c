@@ -1,6 +1,5 @@
-
-/* 
- * esh, the Unix shell with Lisp-like syntax. 
+/*
+ * esh, the Unix shell with Lisp-like syntax.
  * Copyright (C) 1999  Ivan Tkatchev
  * This source code is under the GPL.
  */
@@ -52,7 +51,7 @@ static char* rl_find_builtin(char* word, int state) {
 
     ls_free_all(hash_ls1);
     ls_free_all(hash_ls2);
-    
+
     hash_ls1 = hash_keys(builtins);
     hash_ls2 = hash_keys(defines);
 
@@ -80,7 +79,7 @@ static char* rl_find_builtin(char* word, int state) {
     }
 
     iter = ls_next(iter);
-    
+
   }
 }
 

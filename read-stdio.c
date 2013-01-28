@@ -1,6 +1,5 @@
-
-/* 
- * esh, the Unix shell with Lisp-like syntax. 
+/*
+ * esh, the Unix shell with Lisp-like syntax.
  * Copyright (C) 1999  Ivan Tkatchev
  * This source code is under the GPL.
  */
@@ -54,7 +53,7 @@ char* read_read(char* prompt) {
       gc_free(ret);
       ret = tmp;
     }
-    
+
     ret[i] = foo;
     i++;
   }
@@ -68,4 +67,3 @@ char* read_read(char* prompt) {
 void read_done(void) {
   /* Nothing. */
 }
-

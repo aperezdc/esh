@@ -1,5 +1,5 @@
-/* 
- * esh, the Unix shell with Lisp-like syntax. 
+/*
+ * esh, the Unix shell with Lisp-like syntax.
  * Copyright (C) 1999  Ivan Tkatchev
  * This source code is under the GPL.
  */
@@ -19,7 +19,7 @@
  *    insertion, and "ls_free" does not free the data in the list.
  *    "ls_free_all" is provided as a convinience -- it will free
  *    the data before deleting the list node.
- *  + "ls_copy" and "ls_free_all" make lots of assumptions about type 
+ *  + "ls_copy" and "ls_free_all" make lots of assumptions about type
  *     information.
  */
 

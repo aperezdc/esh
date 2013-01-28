@@ -1,5 +1,5 @@
-/* 
- * esh, the Unix shell with Lisp-like syntax. 
+/*
+ * esh, the Unix shell with Lisp-like syntax.
  * Copyright (C) 1999  Ivan Tkatchev
  * This source code is under the GPL.
  */
@@ -37,7 +37,7 @@ static int typecheck_aux(char* tspec, list* data, int* i, int quiet) {
 
     if (stoploop || err) break;
 
-    if (!data) { 
+    if (!data) {
       if (tspec[(*i)] && tspec[(*i)] != ')') {
 	err = 3;
       }
@@ -69,7 +69,7 @@ static int typecheck_aux(char* tspec, list* data, int* i, int quiet) {
 	data = ls_next(data);
 	break;
       }
-      
+
     case '?':
       data = ls_next(data);
       break;
@@ -125,7 +125,7 @@ static int typecheck_aux(char* tspec, list* data, int* i, int quiet) {
 	while (data && ls_type(data) == type) {
 	  data = ls_next(data);
 	}
-      
+
 	break;
       }
 
@@ -145,7 +145,7 @@ static int typecheck_aux(char* tspec, list* data, int* i, int quiet) {
       error("esh: type of the given arguments did not match "
 	    "the required type.");
       break;
-      
+
     case 2:
       error("esh: extraneous arguments given.");
       break;
@@ -159,7 +159,7 @@ static int typecheck_aux(char* tspec, list* data, int* i, int quiet) {
       break;
     }
   }
-  
+
   return err;
 }
 
@@ -178,7 +178,7 @@ static inline int quiet_typecheck(char* tspec, list* arg) {
 }
 
 
-static int fancy_typecheck(char* tspec, list* arg, 
+static int fancy_typecheck(char* tspec, list* arg,
 			   char* cmdname, char* cmddesc) {
 
   int ret = typecheck(tspec, arg);
@@ -191,7 +191,7 @@ static int fancy_typecheck(char* tspec, list* arg,
 
     for (i = 0; i < len; i++) {
       printf(" ");
-      
+
       switch (tspec[i]) {
       case 's':
 	printf("<string>");
@@ -212,7 +212,7 @@ static int fancy_typecheck(char* tspec, list* arg,
       case 'f':
 	printf("<file>");
 	break;
-	
+
       case 'p':
 	printf("<process>");
 	break;
@@ -271,7 +271,7 @@ static long do_atoi(char* dat, int* err, long def) {
   long ret;
 
   if (!dat) return def;
-    
+
   ret = strtol(dat, &merr, 0);
   *err = 0;
 
@@ -333,7 +333,7 @@ void register_chdir(void) {
     return;
   }
 
-  /* Hack -- this will memory leak slightly, but will work on 
+  /* Hack -- this will memory leak slightly, but will work on
    * systems that expect a mallocated string in "putenv". */
 
   buff2 = (char*)malloc(sizeof(char) * (strlen(bar) + 6));
@@ -354,12 +354,12 @@ void register_chdir(void) {
 static list* cd(list* arg) {
   char* dirnm;
 
-  if (arg && ls_data(arg) && 
+  if (arg && ls_data(arg) &&
       fancy_typecheck("s", arg, "cd",
 		      "This command changes the current directory.")) {
     return NULL;
   }
-  
+
   if (!arg) {
     dirnm = getenv("HOME");
   } else {
@@ -416,7 +416,7 @@ list* eval_aux(list* arg, int mode, int strength) {
   list* ret = NULL;
   list* tmp;
   list* tmp2;
-  
+
   for (iter = arg; iter != NULL; iter = ls_next(iter)) {
 
     switch (ls_type(iter)) {
@@ -433,7 +433,7 @@ list* eval_aux(list* arg, int mode, int strength) {
 	  ret = ls_cons(ls_copy(rec), ret);
 	  ls_type_set(ret, TYPE_LIST);
 	  ls_flag_set(ret, ls_flag(iter));
-	  
+
 	} else {
 
 	  tmp = eval_aux(rec, 1, strength);
@@ -449,7 +449,7 @@ list* eval_aux(list* arg, int mode, int strength) {
 	    }
 
 	    ls_free_shallow(tmp);
-	    
+
 	  } else {
 	    ret = ls_cons(NULL, ret);
 	    ls_type_set(ret, TYPE_LIST);
@@ -468,7 +468,7 @@ list* eval_aux(list* arg, int mode, int strength) {
       ls_type_set(ret, ls_type(iter));
       ls_flag_set(ret, ls_flag(iter));
       break;
-      
+
     case TYPE_HASH:
       hash_inc_ref(ls_data(iter));
       gc_inc_ref(ls_data(iter));
@@ -489,12 +489,12 @@ list* eval_aux(list* arg, int mode, int strength) {
   }
 
   ret = ls_reverse(ret);
-    
+
   if (mode) {
     tmp = do_builtin(ret);
 
     ls_free_all(ret);
-  
+
     return tmp;
 
   } else {
@@ -545,7 +545,7 @@ static list* get(list* arg) {
 		      "This command examines the environment.")) {
     return NULL;
   }
-  
+
   key = ls_data(arg);
 
   tmp = getenv(key);
@@ -599,7 +599,7 @@ static list* run(list* arg) {
   fd1 = ls_data(ls_next(arg));
   fd2 = ls_data(ls_next(ls_next(arg)));
 
-  ret = do_pipe(fd1[0], fd2[1], ls_next(ls_next(ls_next(arg))), 
+  ret = do_pipe(fd1[0], fd2[1], ls_next(ls_next(ls_next(arg))),
 		(int)ls_data(arg), 0);
 
   if ((int)ls_data(arg)) {
@@ -611,7 +611,7 @@ static list* run(list* arg) {
       (*foo) = ret;
       bar = ls_cons(foo, NULL);
       ls_type_set(bar, TYPE_PROC);
-      
+
       return bar;
     }
 
@@ -690,7 +690,7 @@ static list* my_exit(list* arg) {
   char* tmp = "0";
 
   if (arg && ls_data(arg) &&
-      fancy_typecheck("s", arg, "exit", 
+      fancy_typecheck("s", arg, "exit",
 		      "This command exits with the given exit status.")) {
     return NULL;
   }
@@ -718,7 +718,7 @@ static list* alias(list* arg) {
   list* old = NULL;
 
   if (quiet_typecheck("sL", arg) &&
-      fancy_typecheck("sS", arg, "alias", 
+      fancy_typecheck("sS", arg, "alias",
 		      "This command will create an alias with the given name "
 		      "and expansion.\nNote that the arguments have to be "
 		      "defined as a list, not as a string.\n"
@@ -743,7 +743,7 @@ static list* alias(list* arg) {
 
   return NULL;
 }
-    
+
 
 static list* plus(list* arg) {
   int tot = 0;
@@ -755,7 +755,7 @@ static list* plus(list* arg) {
     gc_free(ret);
     return NULL;
   }
-  
+
   for (; arg != NULL; arg = ls_next(arg)) {
     tmp = ls_data(arg);
 
@@ -783,7 +783,7 @@ static list* times(list* arg) {
   int err;
   char* ret = (char*)gc_alloc(sizeof(char) * 80, "times");
   char* tmp;
-  
+
   if (fancy_typecheck("S", arg, "*", "This command multiplies its "
 		      "arguments.")) {
     gc_free(ret);
@@ -821,11 +821,11 @@ static list* minus(list* arg) {
     return NULL;
   }
 
-  
+
   tmp = ls_data(arg);
 
   tot = do_atoi(tmp, &err, 0);
-  
+
   if (err) {
     error("esh: -: \"-\" only accepts numeric arguments.");
     gc_free(ret);
@@ -868,7 +868,7 @@ static list* over(list* arg) {
   tmp = ls_data(arg);
 
   tot = do_atoi(tmp, &err, 0);
-  
+
   if (err) {
     error("esh: /: \"/\" only accepts numeric arguments.");
     gc_free(ret);
@@ -916,13 +916,13 @@ static job_t* nth_job(int i) {
 
     iter = ls_next(iter);
   }
-  
+
   return ls_data(iter);
 }
 
 
 static list* fg(list* arg) {
-  if (arg && 
+  if (arg &&
       fancy_typecheck("s", arg, "fg",
 		      "This command brings a job into the foreground.\n"
 		      "The optional argument specifies which job number "
@@ -946,9 +946,9 @@ static list* fg(list* arg) {
 	return NULL;
       }
     }
-      
+
     job = nth_job(i);
-    
+
     if (!job) {
       error("esh: fg: invalid job number.");
       return NULL;
@@ -964,7 +964,7 @@ static list* fg(list* arg) {
 
 
 static list* bg(list* arg) {
-  if (arg && 
+  if (arg &&
       fancy_typecheck("s", arg, "bg",
 		      "This command brings a job into the background.\n"
 		      "The optional argument specifies which job number "
@@ -998,7 +998,7 @@ static list* bg(list* arg) {
 
     job_background(job);
   }
-  
+
   return NULL;
 }
 
@@ -1020,8 +1020,8 @@ static list* list_jobs(list* arg) {
     job = ls_data(iter);
 
     printf("%-3d %-35s %-6d %-6d %-8s\n", i, job->name, job->last_pid,
-	   job->pgid, 
-	   (job->status == JOB_STOPPED ? "Stopped" : 
+	   job->pgid,
+	   (job->status == JOB_STOPPED ? "Stopped" :
 	    (job->status == JOB_DEAD ? "Dead" :
 	     "Running")));
   }
@@ -1065,7 +1065,7 @@ static list* my_interactive(list* arg) {
     return ls_copy(ls_false);
   }
 }
-    
+
 
 
 static list* define(list* arg) {
@@ -1073,7 +1073,7 @@ static list* define(list* arg) {
 
   list* old;
 
-  if (fancy_typecheck("s*", arg, "define", 
+  if (fancy_typecheck("s*", arg, "define",
 		      "This command will create a new command.\n"
 		      "The first argument is the name, and the rest are "
 		      "arguments that will be\nautomatically passed to "
@@ -1128,7 +1128,7 @@ static list* my_if(list* arg) {
 		      "returned.")) {
     return NULL;
   }
-  
+
   arg = ls_copy(arg);
 
   for (i = 0, iter = arg; iter != NULL; iter = ls_next(iter), i++) {
@@ -1153,7 +1153,7 @@ static list* my_if(list* arg) {
   ls_free_all(arg_split[0]);
   ls_free_all(arg_split[1]);
   ls_free_all(arg_split[2]);
-  
+
   return tmp;
 }
 
@@ -1193,7 +1193,7 @@ static list* pop(list* arg) {
   ret = ls_cons(ls_data(foo), NULL);
   ls_type_set(ret, ls_type(foo));
   ls_flag_set(ret, ls_flag(foo));
-  
+
   gc_free(foo);
 
   return ret;
@@ -1214,7 +1214,7 @@ static list* push(list* arg) {
   ls_flag_set(stack, ls_flag(arg));
 
   gc_free(arg);
-  
+
   return NULL;
 }
 
@@ -1234,7 +1234,7 @@ static list* my_list(list* arg) {
   list* ret;
   list* tmp;
 
-  if (fancy_typecheck("*", arg, "list", 
+  if (fancy_typecheck("*", arg, "list",
 		      "This command simply returns a list composed of the "
 		      "given arguments.")) {
     return NULL;
@@ -1285,7 +1285,7 @@ static list* my_print(list* arg) {
 static list* my_hash_make(list* arg) {
   hash_table* ntab;
   list* ret;
-  
+
   if (fancy_typecheck("", arg, "hash-make",
 		      "This command will return a new hash table.")) {
     return NULL;
@@ -1297,7 +1297,7 @@ static list* my_hash_make(list* arg) {
 
   ret = ls_cons(ntab, NULL);
   ls_type_set(ret, TYPE_HASH);
-  
+
   return ret;
 }
 
@@ -1324,7 +1324,7 @@ static list* my_hash_put(list* arg) {
 		      "the\ngiven hash table.")) {
     return NULL;
   }
-  
+
   /*
    * Note the meaning of "hash_put_inc_ref": it will set the reference
    * count of the newly allocated data equal to the reference count of
@@ -1374,7 +1374,7 @@ static list* alias_hash(list* arg) {
 
   ret = ls_cons(aliases, NULL);
   ls_type_set(ret, TYPE_HASH);
-  
+
   return ret;
 }
 
@@ -1471,14 +1471,14 @@ static list* my_parse(list* arg) {
 		      "the shell.")) {
     return NULL;
   }
-  
+
   input = ls_data(arg);
- 
+
   ret = parse_builtin(input, &i, 0, 0);
 
   if (next_token(input, &i, &value, &len)) {
     error("esh: extraneous characters after command.");
-    
+
     ls_free_all(ret);
     ret = NULL;
   }
@@ -1543,7 +1543,7 @@ static list* split(list* arg) {
   if (ls_next(arg)) {
     syntax_blank = ls_strcat(ls_next(arg));
   }
-    
+
   ret = parse_split(ls_data(arg));
 
   if (syntax_blank) {
@@ -1719,7 +1719,7 @@ static list* my_file_open(list* arg) {
     return NULL;
   }
 
-  /* Note: The first fd is for reading, the second is for writing. 
+  /* Note: The first fd is for reading, the second is for writing.
    *       in other words, stdin is [0], stdout is [1]. */
 
   ret[0] = -1;
@@ -1869,7 +1869,7 @@ static list* my_file_type(list* arg) {
 
   if (lstat(ls_data(arg), &sbuff)) {
     return ls_copy(ls_false);
-  } 
+  }
 
   if (S_ISLNK(sbuff.st_mode)) {
     return ls_cons(dynamic_strcpy("link"), NULL);
@@ -1955,7 +1955,7 @@ static list* or(list* arg) {
   for (iter = arg; iter != NULL; iter = ls_next(iter)) {
     tmp1 = car(iter);
     tmp2 = eval(tmp1);
-    
+
     if (!tmp2 || ls_type(tmp2) != TYPE_BOOL || ls_data(tmp2)) {
       ls_free_all(tmp1);
       return tmp2;
@@ -2027,15 +2027,15 @@ static list* version(list* arg) {
   tmp = (char*)gc_alloc(sizeof(char) * 5, "version");
   sprintf(tmp, "%d", VERSION_MAJOR);
   ret = ls_cons(tmp, ret);
-  
+
   tmp = (char*)gc_alloc(sizeof(char) * 5, "version");
   sprintf(tmp, "%d", VERSION_MINOR);
   ret = ls_cons(tmp, ret);
-  
+
   tmp = (char*)gc_alloc(sizeof(char) * 5, "version");
   sprintf(tmp, "%d", VERSION_PATCH);
   ret = ls_cons(tmp, ret);
-  
+
   return ls_reverse(ret);
 }
 
@@ -2069,7 +2069,7 @@ static list* begin(list* arg) {
 
 static list* stderr_handler(list* arg) {
   int* fd;
-  
+
   if (fancy_typecheck("f", arg, "stderr-handler",
 		      "This command will set the standard error handler.\n"
 		      "When the standard error handler is set, all new "
@@ -2183,7 +2183,7 @@ static list* my_while(list* arg) {
   while (1) {
     foo = eval(cond);
 
-    if (exception_flag || 
+    if (exception_flag ||
 	(foo && ls_type(foo) == TYPE_BOOL && !ls_data(foo))) {
 
       ls_free_all(foo);
@@ -2291,7 +2291,7 @@ static list* match(list* arg) {
     regfree(&reg);
     return NULL;
   }
- 
+
   regfree(&reg);
   return ls_copy(ls_true);
 }
@@ -2427,7 +2427,7 @@ static list* less_than(list* arg) {
   int arg1, arg2;
   int err1, err2;
 
-  if (fancy_typecheck("ss", arg, "<", 
+  if (fancy_typecheck("ss", arg, "<",
 		      "This command returns true if the first argument is "
 		      "less than\nthe second.")) {
     return NULL;
@@ -2435,7 +2435,7 @@ static list* less_than(list* arg) {
 
   arg1 = do_atoi(ls_data(arg), &err1, 0);
   arg2 = do_atoi(ls_data(ls_next(arg)), &err2, 0);
-  
+
   if (err1 || err2) {
     error("esh: <: \"<\" only accepts numeric arguments.");
     return NULL;
@@ -2453,7 +2453,7 @@ static list* greater_than(list* arg) {
   int arg1, arg2;
   int err1, err2;
 
-  if (fancy_typecheck("ss", arg, ">", 
+  if (fancy_typecheck("ss", arg, ">",
 		      "This command returns true if the first argument is "
 		      "greater than\nthe second.")) {
     return NULL;
@@ -2461,7 +2461,7 @@ static list* greater_than(list* arg) {
 
   arg1 = do_atoi(ls_data(arg), &err1, 0);
   arg2 = do_atoi(ls_data(ls_next(arg)), &err2, 0);
-  
+
   if (err1 || err2) {
     error("esh: >: \">\" only accepts numeric arguments.");
     return NULL;

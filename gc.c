@@ -1,5 +1,5 @@
-/* 
- * esh, the Unix shell with Lisp-like syntax. 
+/*
+ * esh, the Unix shell with Lisp-like syntax.
  * Copyright (C) 1999  Ivan Tkatchev
  * This source code is under the GPL.
  */
@@ -24,12 +24,12 @@ int __gc_alloc = 0;
 
 void* gc_alloc(size_t size, char* where) {
   void* ret = malloc(size + sizeof(int));
-  
+
   if (!ret) {
     error("esh: could not allocate memory.");
     exit(EXIT_FAILURE);
   }
-  
+
   ((int*)ret)[0] = 1;
 
   __gc_alloc++;
@@ -100,5 +100,4 @@ inline void gc_free(void* ptr) {
 void gc_diagnostics(void) {
   printf("\nAllocated chunks: %d\n", __gc_alloc);
 }
-
 
