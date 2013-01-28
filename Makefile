@@ -11,7 +11,7 @@ CC=gcc
 #READ=read-stdio
 
 INC=-I/usr/include/readline
-LIB=-lreadline -ltermcap
+LIB= -lncurses -lreadline
 READ=read-rl
 
 # Flags to the compiler: 
@@ -19,7 +19,7 @@ READ=read-rl
 # -DMEM_DEBUG          Check for memory leaks.
 #
 
-CFLAGS=-g -Wall -DMEM_DEBUG $(INC)
+CFLAGS += -Wall $(INC)
 
 # No need to change this stuff.
 
@@ -27,7 +27,7 @@ OBJS=list.o hash.o builtins.o esh.o format.o gc.o $(READ).o
 VERS=0.8.5
 
 all: $(OBJS)
-	$(CC) $(OBJS) $(LIB) -o esh
+	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIB) -o esh
 
 backup:
 	cp -f Makefile *.[ch] /home/backup/esh
