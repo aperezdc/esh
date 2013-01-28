@@ -4,6 +4,8 @@
  * This source code is under the GPL.
  */
 
+#ifndef __hash_h__
+#define __hash_h__
 
 /*
  * A very simple hash table implementation, using "buckets".
@@ -29,9 +31,6 @@
  *    holds only lists.
  */
 
-#ifndef HASH_H
-#define HASH_H
-
 typedef struct hash_entry hash_entry;
 typedef list** hash_table;
 
@@ -51,5 +50,4 @@ extern void hash_free(hash_table* t,
 extern void hash_inc_ref(hash_table* t);
 extern list* hash_keys(hash_table* t);
 
-#endif
-
+#endif /* !__hash_h__ */

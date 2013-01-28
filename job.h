@@ -4,9 +4,8 @@
  * This source code is under the GPL.
  */
 
-
-#ifndef JOB_H
-#define JOB_H
+#ifndef __job_h__
+#define __job_h__
 
 #include <termios.h>
 
@@ -26,6 +25,4 @@ struct job_t {
   struct termios terminal_modes;
 };
 
-
-#endif
-
+#endif /* !__job_h__ */

@@ -4,6 +4,8 @@
  * This source code is under the GPL.
  */
 
+#ifndef __read_h__
+#define __read_h__
 
 extern hash_table* defines;
 extern hash_table* builtins;
@@ -26,3 +28,4 @@ extern void read_init(void);
 extern char* read_read(char* prompt);
 extern void read_done(void);
 
+#endif /* !__read_h__ */

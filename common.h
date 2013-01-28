@@ -4,12 +4,11 @@
  * This source code is under the GPL.
  */
 
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef __common_h__
+#define __common_h__
 
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 8
 #define VERSION_PATCH 5
 
-#endif
-
+#endif /* !__common_h__ */

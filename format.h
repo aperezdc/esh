@@ -4,12 +4,11 @@
  * This source code is under the GPL.
  */
 
-#ifndef FORMAT_H
-#define FORMAT_H
+#ifndef __format_h__
+#define __format_h__
 
 extern void signoff(const char* fmt, ...);
 extern void error(const char* fmt, ...);
 extern void error_simple(const char* fmt, ...);
 
-#endif
-
+#endif /* !__format_h__ */

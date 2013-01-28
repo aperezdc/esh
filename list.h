@@ -4,6 +4,8 @@
  * This source code is under the GPL.
  */
 
+#ifndef __list_h__
+#define __list_h__
 
 /*
  * A very simple linked-list implementation.
@@ -22,9 +24,6 @@
  *  + "ls_copy" and "ls_free_all" make lots of assumptions about type
  *     information.
  */
-
-#ifndef LIST_H
-#define LIST_H
 
 #define TYPE_STRING   0
 #define TYPE_LIST     1
@@ -58,5 +57,4 @@ extern void ls_flag_set(list* ls, char flag);
 extern char ls_flag(list* ls);
 extern list* ls_copy(list* ls);
 
-#endif
-
+#endif /* !__list_h__ */

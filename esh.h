@@ -4,6 +4,8 @@
  * This source code is under the GPL.
  */
 
+#ifndef __esh_h__
+#define __esh_h__
 
 extern int interactive;
 extern int exception_flag;
@@ -43,3 +45,4 @@ extern char* ls_strcat(list* ls);
 extern void job_foreground(job_t* job);
 extern void job_background(job_t* job);
 
+#endif /* !__esh_h__ */

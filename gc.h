@@ -4,9 +4,8 @@
  * This source code is under the GPL.
  */
 
-#ifndef _GC_H
-#define _GC_H
-
+#ifndef __gc_h__
+#define __gc_h__
 
 typedef struct gc_node gc_node;
 
@@ -24,5 +23,4 @@ extern int gc_refs(void* ptr);
 extern void gc_free(void* ptr);
 extern void gc_diagnostics(void);
 
-#endif
-
+#endif /* !__gc_h__ */
