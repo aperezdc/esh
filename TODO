@@ -1,0 +1,10 @@
+ * Better tab-completion.
+ * String handling: chopping off bits, substrings.
+ * Better reporting of memory leaks.
+ * Rewrite "alive?" in a more portable way.
+ * Regexps.
+
+ ? libdl support. Is it portable enough?
+ * Fix the broken globber.
+
+

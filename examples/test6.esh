@@ -1,0 +1,21 @@
+
+(eval ~(if ~(false)
+	   ~(print "Yes, lev. 1" (nl))
+	   ~(if ~(false)
+		~(print "Yes, lev. 2" (nl))
+		~(if ~(false)
+		     ~(print "Yes, lev. 3" (nl))
+		     ~(if ~(false)
+			  ~(print "Yes, lev. 4" (nl))
+			  ~(print "No." (nl)))))))
+
+
+(eval ~(if ~(false)
+	   ~(print "Yes, lev. 1" (nl))
+	   ~(begin
+	      (if ~(false)
+		  ~(print "Yes, lev. 2" (nl))
+		  ~(print "No." (nl)))
+	      (if ~(false)
+		  ~(print "Yes, lev. 2 <2>" (nl))
+		  ~(print "No. <2>" (nl))))))

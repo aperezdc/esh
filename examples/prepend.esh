@@ -1,0 +1,22 @@
+
+#
+# This script was used to prepend the header notice to every
+# source code file.
+#
+
+(define prepend
+  ~(push (file-read (file-open file (pop))))
+  ~(push (squish (pop)
+		 (file-read (file-open file (top)))))
+  ~(file-write (file-open truncate (rot)) (rot)))
+
+
+(define prepend-for-each
+  ~(if ~(not-null? (rot))
+       ~(begin (prepend (rot) (rot))
+	       (prepend-for-each (cdr (l-stack))))
+       ()))
+
+(prepend-for-each (stack))
+
+		    

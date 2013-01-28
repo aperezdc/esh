@@ -1,0 +1,21 @@
+
+#
+# Place these lines into your ".eshrc".
+#
+
+(define dir-names (hash-make))
+
+(hash-put (dir-names) "/home/ivan/src/esh" "Esh source code")
+
+(prompt ~(push (get PWD))
+	~(push (hash-get (dir-names) (top)))
+	"["
+	~(rot)
+	~(if ~(rot)
+	     ~(squish " => " (top))
+	     "")
+	"]$ "
+	~(null (pop))
+	~(null (pop)))
+
+

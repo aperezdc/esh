@@ -1,0 +1,51 @@
+0.1.0:    First public release.
+0.2.0:    Never released.
+0.3.0:    Created explicit "boolean" type.
+          Changed all predicates to use the boolean type.
+          Created a "file" type.
+          Changed the file I/O functions as well as "run" to
+          use file objects.
+          Added some convenience commands.
+          Fixed bugs.
+          Wrote an emacs mode for editing shell scripts.
+          Rewrote the Makefile.
+0.3.5:    Added the "stderr" and "stderr-handler" commands.
+          Fixed bugs.
+0.3.6:    Bugfixes.
+0.4.0:    More bugfixes.
+0.4.5:    Never released.
+0.5.0:    "run" now returns an object of type "process."
+          Added the "alive?" command.
+          Changed the refcounter from the disgusting O(n) list
+          implementation to an O(1) one.
+          Added the "while" command as an efficiency hack. 
+0.6.0:    The backslash quote has been removed.
+          Use the tilde quote instead.
+          Now includes a very simple replacement for readline.
+          (This means that readline is no longer required.)
+          Bugfixes and usability features.
+          Added the "alias-hash" command and the "car-l" command.
+          Expanded the manual.
+          Added the "chop!", "chop-nl!", "match", and "reverse" commands.
+0.6.5:    Bugfixes.
+          Added the "chars", "filter", "clone", and "substring?" commands.
+0.7.0:    "run" and "run-simple" now return the exit status of the 
+          pipeline if the job was launched in the foreground.
+          "chop!" and "chop-nl!" now return their arguments.
+          Added "begin-last", which is like the "begin" in Scheme.
+          Added the "<" and ">" commands.
+
+0.7.5:    Bugfixes.
+          The "split" command can now split on any arbitrary set of field 
+          separators.
+          Added the "void" command and type.
+          Added the "repeat" command.
+
+0.8:      Several small tweaks.
+
+0.8.5:    Implemented tab-completion for commands.
+          Fixed the readline dependency in a sane way.
+          "run" and "run-simple" now work in a more sane way -- they now evaluate nested lists that
+	  are part of the argument list. That is, something like 
+	  "(run-simple ~(echo (top))) will work as expected.
+	  

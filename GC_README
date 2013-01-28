@@ -1,0 +1,7 @@
+
+  The much-improved refcounter code in esh 0.5 can be used as a drop-in
+replacement for malloc/free. It has been written in such a way as to be
+imdependent of esh itself. Simply compile and link gc.c along with the
+rest of your program, and replace calls to "malloc" with "gc_alloc",
+and "free" with "gc_free".
+

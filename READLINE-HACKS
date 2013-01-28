@@ -1,0 +1,9 @@
+Only one readline hack so far: 
+
+You can use control-j to insert a literal newline. (i.e. when you
+want to type long definitions interactively.)
+
+One non-readline hack: typing Control-C while the shell is evaluating 
+commands will take you back to the prompt. This is useful when you
+have inadvertently entered an infinite loop.
+

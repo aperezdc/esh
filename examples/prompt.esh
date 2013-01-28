@@ -1,0 +1,13 @@
+(define setxtermtitle
+        ~(print "XTerm title: " (stack) (nl)))
+
+(if ~(= (get TERM) xterm) 
+    ~(prompt ~(get USER) 
+             ":" 
+             ~(get TTY) 
+             ":" 
+             ~(get PWD) 
+             "$ "
+             ~(setxtermtitle (squish "xterm:[" (get TTY) "]:" (get PWD))))
+    ())
+

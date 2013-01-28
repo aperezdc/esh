@@ -1,0 +1,18 @@
+
+#
+# Regex globber. This script accepts a regular expresion and finds all
+# filenames in the current directory that match it. The given command is then
+# run with the matching filenames as arguments.
+#
+
+(define converter
+  ~(run-simple (l-stack)))
+
+(if ~(typecheck "ss" (stack))
+    ~(print "Usage: (convert <regexp> <command>)" (nl))
+    ~(converter (rot) (split 
+                       (gobble (standard) 
+			       ~(/bin/ls -1) 
+			       (list grep (rot))))))
+
+

@@ -1,0 +1,21 @@
+
+#
+# This is a sample .eshrc that implements a restricted shell.
+#
+
+(define restricted
+  ~(print "Sorry, but this function has been restricted." (nl)))
+
+(define for-each
+  ~(if ~(not-null? (rot))
+       ~(begin ((rot) (rot))
+               (for-each (cdr (l-stack))))
+       ()))
+
+(define restrict-command
+  ~(if ~(not-null? (top))
+       ~(define (pop) (list restricted))
+       ()))
+
+(for-each restrict-command cd fg bg)
+

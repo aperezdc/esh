@@ -1,0 +1,37 @@
+
+
+#
+# Run the two commands in the background, in parallel.
+#
+
+(define print-color-piped
+  ~(run (true) 
+	(file-open string (squish (top) (nl)))
+	(standard)
+	(list 'bold' 'none' (top)))
+
+  ~(run (true)
+	(file-open string (squish 'bold-' (top) (nl)))
+	(standard)
+	(list 'bold' 'bold' (top))))
+
+#
+# Run the two commands in the foreground, sequentially.
+#
+
+(define print-color-simple
+  ~(run-simple (list 'echo' (top))
+	       (list 'bold' 'none' (top)))
+
+  ~(run-simple (list 'echo' (squish 'bold-' (top)))
+	       (list 'bold' 'bold' (top))))
+
+
+
+(print (nl) 'Sequential execution: ' (nl))
+(for-each print-color-simple ~(black red green yellow blue magenta cyan white))
+
+(print (nl) 'Parallel execution: ' (nl))
+(for-each print-color-piped ~(black red green yellow blue magenta cyan white))
+
+(run-simple ~(sleep 100))

@@ -1,0 +1,1170 @@
+\input texinfo   @c -*-texinfo-*-
+@c %**start of header
+@setfilename esh.info
+@settitle esh, the easy shell.
+@c %**end of header
+
+@ifinfo
+@dircategory Shells
+@direntry
+* esh: (esh).
+@end direntry
+@end ifinfo
+
+@titlepage
+@sp 10
+@center @titlefont{esh, the easy shell.}
+@end titlepage
+
+@ifinfo
+@node Top, Rationale, (dir), (dir)
+@top esh, the easy shell.
+     
+@code{esh} is a new, lightweight Unix shell designed for maximum simplicity and
+generality.
+
+@end ifinfo
+     
+@menu
+* Rationale::               Why write it?
+* Overview::                What is it?
+* Details::                 In-depth information on programming the shell.
+* Differences from Scheme:: How this shell differs from Scheme.
+* Differences from sh::     How this shell differs from sh-based shells.
+* Command Index::           All the builtin commands.
+* Concept Index::           Concepts referred to in this manual.
+@end menu
+
+@node     Rationale, Overview, Top, Top
+@cindex Rationale
+@chapter Rationale
+
+@code{esh} was primarily written out of a need for a simple and lightweight shell
+for Unix. As such, it deviates completely from all of the traditional
+shells, opting instead for a Lisp-like syntax. This allows exceptionally 
+small size, both in terms of lines of code and memory consumption, while
+retaining remarkable flexibility and programmability.
+
+@node     Overview, Details, Rationale, Top
+@cindex Overview
+@cindex Introduction
+@cindex Getting started
+@chapter Overview
+
+@ifinfo
+An overview of the basic information about the shell.
+@end ifinfo
+
+@menu
+* Starting esh::     How to launch it.
+* Interaction::        Simple interaction with the shell.
+* Simple Programming:: Writing simple programs.
+* Non-interactive::    Running the shell non-interactively.
+* Job Control::        How to use job control.
+* Basic Usage::        Some essential commands.
+@end menu
+
+@node Starting esh, Interaction,     , Overview
+@cindex Starting @code{esh}
+@cindex Command line parameters
+@cindex Launching @code{esh}
+@cindex .eshrc
+@cindex eshrc
+@section Starting @code{esh}
+
+To start the shell, simply type @code{esh}. There are no command-line 
+parameters. However, since all the command-line arguments are available
+to the shell programmer, it is a simple matter to write your own argument
+processing routine and place it in your @code{.eshrc} file.
+
+Both @code{/etc/eshrc} and the @code{.eshrc} in your home directory will
+be run by the shell on startup, if they exist.
+
+@node Interaction, Simple Programming, Starting esh, Overview
+@cindex Interaction
+@cindex Running commands
+@cindex Executing files
+@cindex Pipes and redirection
+@section Interaction
+
+If the shell is running interactively, you will get a prompt, @code{$ } by
+default. Since the shell uses the readline library, you can use line-editing
+keystrokes, the history buffer, filename completion, and the rest of the 
+goodies provided by the readline library.
+
+To run a single executable, simply type it in as you would in any other
+shell. Example: @code{/usr/games/fortune -m Unix}.
+
+To run a pipeline, type several commands separated by commas or vertical
+lines. Example:
+@code{cat /var/log/messages, grep pppd, grep "IP address", xmessage -file -}.
+
+To run a pipeline with file redirection, place the redirection symbols and the
+filenames after the pipeline. Example:
+@code{sort, uniq < names.raw > names.sorted}. In this case, the contents of
+@code{names.raw} are used as the standard input of @code{sort}, and the output 
+of the whole pipeline is saved to @code{names.sorted}. The order in which 
+the redirection symbols are given does not matter, but a valid filename 
+should always follow a redirection symbol.
+
+Note one major pitfall: @code{cd}, @code{bg}, @code{fg}, etc., are all
+builtin shell commands! For info on running shell commands, see the
+next section. (@pxref{Simple Programming})
+
+@node Simple Programming, Non-interactive, Interaction, Overview
+@cindex Simple programming
+@cindex Syntax, basic
+@cindex Basics of shell programming
+@section Simple Programming
+
+All shell commands are specified using a parenthetical syntax
+very similar to that of Lisp or Scheme. Example: Use @code{(cd /var)} to change
+the current directory. In this case, @code{cd} is the name of the command,
+and @code{/var} is the argument. Multiple arguments to the same 
+command are separated by white space. Example: @code{(set HOME /home/ivan)}.
+Builtin commands never accept options in the
+style of compiled programs. Also note that quotes around string values are
+not required, though they are certainly allowed at any time if you wish
+to escape special characters. (In fact, using quotes is the only way to
+do this. Backslash escape sequences are not recognized.) Example: 
+@code{(cd "funny,directory name()")}. In this case, the whole string inside
+the quotes is used as the argument verbatim. Single quotes and double
+quotes are equivalent.
+
+If a command returns anything, the returned data will be printed
+by the shell. Example: @code{(get HOME)} @result{} @code{/home/ivan}.
+
+Note that you can certainly use the return values of one command as input
+to another. Example: @code{(cd (get HOME))}
+
+If you want to pass a list instead of a string as an argument to a command,
+quote the list with a tilde. Example: 
+@code{(run-simple ~(ls --color=yes))}. Here, the @code{run} command is given
+a list as an argument. 
+
+Note that a sublist of a quoted list is also quoted; that is, 
+@code{~(1.1 (2.1 2.2) 1.2)} is a list of three elements, the first and last
+are strings and the middle element is a list. 
+
+@xref{Basic Usage}, for an explanation of what @code{cd}, @code{get}, 
+@code{set}, and @code{run} do.
+
+@node Non-interactive, Job Control, Simple Programming, Overview
+@cindex Non-interactive
+@cindex Files, as shell scripts
+@section Non-interactive
+
+If the shell is started non-interactively -- for example, when the standard
+input to the shell is a file -- the shell will only accept commands.
+To run executables and construct pipes, simply use the @code{run} 
+command.
+(@pxref{Basic Usage})
+
+@node Job Control, Basic Usage, Non-interactive, Overview
+@cindex Job control
+@cindex Foreground
+@cindex Background
+@cindex Stopping jobs
+@section Job Control
+
+If the shell is running interactively, you will have access to job control
+primitives. 
+
+To stop a job in the foreground, simply type @kbd{C-z}, as in other shells.
+
+To bring the last known job into foreground or background, issue the @code{fg}
+or @code{bg} command, respectively, without arguments. 
+(@pxref{Simple Programming})
+
+To get a listing of all the currently known jobs, issue the @code{jobs} 
+command, also without arguments.
+
+If the @code{fg} or @code{bg} command is given a single numeric argument, it
+will act on the job number specified by that argument. To find out the job
+number for a command, simply issue the @code{jobs} command. 
+
+Note: the job number is @emph{not} the PID!
+
+
+@node Basic Usage, Syntax, Job Control, Overview
+@cindex Command list
+@cindex Basic commands
+@cindex Builtin command list, basic
+@findex jobs
+@findex cd
+@findex fg
+@findex bg
+@findex run
+@findex run-simple
+@findex get
+@findex set
+@findex env
+@findex print
+@findex +
+@findex -
+@findex *
+@findex /
+@findex if
+@findex list
+@findex eval
+@findex =
+@section Basic Usage
+
+@itemize @bullet
+@item 
+@code{(cd [string])} Change the current directory to the given
+argument. If the directory name is a single dash, the previous directory
+will be used. (i.e. the value of the environment variable @code{OLDPWD})
+If the command is called without any arguments, change to the home directory.
+
+@item
+@code{(jobs)} List the current jobs.
+
+@item
+@code{(fg [number])} If the optional numeric argument is given, bring
+the job number given by the argument into the foreground. If this argument
+is omitted, bring the first job into the foreground.
+
+@item
+@code{(bg [number])} Same as @code{fg}, but puts a job into the background.
+
+@item
+@code{(run <bool> <file> <file> <list>...)} Run a pipeline.
+The first argument should be @code{false} if you want the command to be
+brought into the foreground, or @code{true} if otherwise.
+The next two arguments are the input and output redirection files, 
+respectively. You can use @code{(standard)} for standard input/output. 
+The rest of the arguments are the commands you want to run,
+given as lists.
+If the command was run in the background, then the return value
+is the PID of the last executable in the pipeline. Otherwise, the return
+value is the exit status of the pipeline.
+
+Examples: 
+@code{(run (false) (standard) (standard) ~(/usr/games/fortune -m Unix))} 
+is equivalent to
+@code{/usr/games/fortune -m Unix}.
+@code{(run (false) (file-open file "names.raw") (file-open file "names.sorted") ~(sort) ~(uniq))} is equivalent to
+@code{sort, uniq < names.raw > names.sorted}.
+
+@item
+@code{(run-simple <list>...)} Equivalent to 
+@code{(run (false) (standard) (standard) ...)}.
+This command returns the exit status of the pipeline.
+
+@item
+@code{(get <string>)} Return the environment variable named by the given
+argument.
+
+@item
+@code{(set <string> <string>)} Set the environment variable named by the first
+string to be the second string.
+
+@item
+@code{(env)} List all environment variables.
+
+@item
+@code{(print ...)} Print the given arguments on the standard output in
+a human-readable form. 
+
+@item
+@code{(+ <number>...)} Add all the arguments.
+
+@item
+@code{(- <number>...)} Subtract the arguments following the first argument
+from the first argument.
+
+@item
+@code{(* <number>...)} Multiply all the arguments.
+
+@item
+@code{(/ <number>...)} Divide the first argument by the rest of the arguments.
+
+@item
+@code{(< <number> <number>)} Return @code{true} if the first number is
+less than the second; otherwise, return @code{false}.
+
+@item
+@code{(> <number> <number>)} Return @code{true} if the first number is
+less than the second; otherwise, return @code{false}.
+
+@item
+@code{(if <any> <any> <any>)} If the \"eval\" of the
+first argument is @code{false}, execute @code{eval} on the second argument. 
+Otherwise, execute @code{eval} on the third argument. Note that the 
+arguments must be quoted right! (@pxref{Quoting Trickery} for 
+more info on that.)
+
+@item
+@code{(list ...)} Compose a list made of the given arguments and return it.
+
+@item
+@code{(eval ...)} If an argument is a string or a hash table, simply return it.
+Otherwise, execute the given list as if it was a command. 
+For example, typing in
+@code{(eval ~(print Hello World!))} is equivalent to 
+@code{(print Hello World!)}. However, you must make sure that the list given
+to @code{eval} is quoted properly in order to delay evaluation
+until the right moment. (@pxref{Quoting Trickery} for more info.)
+
+@item
+@code{(= <string> <string>)} Compare the two strings and return an empty
+list if they are not equal. Otherwise, simply return the first string.
+
+@end itemize
+
+
+
+@node Details, Differences from Scheme, Overview, Top
+@cindex Details
+@cindex Programmer's Manual
+@cindex Tutorial
+@chapter Details
+
+A programmer's manual and a tutorial.
+
+@menu
+* Syntax::             Syntax of the shell.
+* Semantics::          Writing commands, control structures, data storage.
+* Quoting Trickery::   Controlling @code{eval} and using data as code.
+* Command List::       More commands.
+* Tutorial::           Learn by example.
+@end menu
+
+
+@node Syntax, Semantics, Basic Usage, Details
+@cindex Syntax
+@section Syntax
+
+Here is a description of the syntax of @code{esh}. Note, however, that 
+this grammar is only a descriptive tool, since the actual parser in the 
+shell is written by hand.
+
+Also note that using the interactive-command syntax is not allowed when
+the shell is not started interactively.
+
+@example
+openparen-symbol = '('
+closeparen-symbol = ')'
+delay-symbol = '~' | '$'
+pipe-symbol = ',' | '|'
+redirection-symbol = '<' | '>'
+
+script = /* Nothing */ |
+         list script
+
+list = openparen-symbol list-elements closeparen-symbol
+
+list-elements = /* Nothing */ |
+                string list-elements |
+                delay-symbol list list-elements |
+                list list-elements
+
+interactive-command = list |
+                      interactive-pipeline
+
+interactive-pipeline = /* Nothing */ | 
+                      interactive-pipe redirection redirection
+
+interactive-pipe = /* Nothing */ |
+                   single-command pipe-symbol interactive-pipe
+
+single-command = /* Nothing */ |
+                 string single-command
+
+redirection = /* Nothing */ |
+              redirection-symbol string
+@end example
+
+@node Semantics, Quoting Trickery, Syntax, Details
+@cindex Commands
+@cindex Recursion
+@cindex Control structures
+@cindex Loops
+@cindex Variables
+@cindex Stack, local variable
+@cindex Arguments, to commands
+@section Semantics
+
+One major deviation of @code{esh} from other programming languages is
+that commands are not functions. Any command can return any number of
+values, without explicit unpacking syntax. (e.g. @code{Python})
+
+For example, @code{(rest ~(foo bar baz))} @result{} @code{bar baz}.
+These returned elements are not a list! Therefore, this code
+will produce an error: @code{(rest (rest ~(foo bar baz)))}. Instead, you
+should write: @code{(rest (list (rest ~(foo bar baz))))}.
+
+The first, most important concept is the @code{define} command. This command
+allows you to define new commands, which are no different from builtin
+commands as far as the programmer is concerned.
+
+The syntax of @code{define} is simple: @code{(define <string> ...)}.
+The first argument is simply the name of the command you are defining, and
+the rest of the arguments will simply be passed to @code{eval} whenever
+your new command is called.
+
+It's important to realize that this code snippet
+@code{(define foo ~(print bar) bar) (foo)} is identical to
+this one: @code{(eval ~(print bar) bar)}. Therefore, anything that
+applies to @code{eval} also applies to commands defined by @code{define}.
+(@pxref{Quoting Trickery} for more on that.)
+
+If you are familiar with Scheme or Lisp, you'll notice the lack of
+argument passing information in the syntax of @code{define}. The reason for
+that is that the argument passing convention is radically different in
+@code{esh} from other Lisp-like languages.
+
+Every command in @code{esh} has a stack all to itself for scratch space
+and local variables. When a user-defined command is run, all the arguments
+are simply placed on the local-variable stack, the first argument at the
+top.
+
+To access the local-variable stack, several commands can be used.
+@code{(push <any>)} will push a value onto the stack, @code{(pop)} will
+remove the top element of the stack and return it, @code{(top)} will return
+a copy of the top element, @code{(stack)} will return a copy of the whole
+stack, and finally @code{(rot)} will switch the top and the next-to-top
+elements of the stack and return a copy of the element that just became
+the top one.
+
+The top-level of the interpreter also has a stack; that is, typing the
+stack manipulation commands directly into the interpreter will produce the
+expected results.
+
+Note that commands called recursively do not inherit the stack of the
+calling command.
+
+Also note that @code{(stack)} does not return a list, it returns an 
+arbitrary number of elements. If you find typing @code{(list (stack))}
+frequently, you can instead use the @code{(l-stack)} command, since they are
+identical.
+
+The shell does not support looping constructs in the traditional sense --
+like in Scheme, looping is accomplished by using recursion. Here is
+a concrete example:
+
+@example
+(define print-squish
+        ~(if ~(not-null? (top))
+             ~(begin 
+                   (print (squish (pop)))
+                   (print-squish (stack)))
+              ()))
+@end example
+
+The command @code{begin} simply returns the given arguments; its purpose 
+is to allow the use of several commands where one is asked for.
+(@pxref{Command List} for the syntax of @code{if})
+
+Since @code{esh} 0.2, there is an explicit @code{true} and @code{false}
+value; these values are different from all other possible values. Commands
+that operate on predicates (@code{if}, @code{and}, @code{or}, @code{=}, etc.)
+use these values extensively. You can use them in your own scripts with
+the @code{true} and @code{false} commands. Note that @code{if}, @code{and}, 
+and @code{or} do not explicitly check for @code{true}, so to these commands
+any value that isn't @code{false} is "true", so to say.
+
+@node Quoting Trickery, Command List, Semantics, Details
+@cindex Quoting
+@cindex @code{eval}, quoting for
+@cindex Code-as-data
+@cindex Tilde, as a quote character
+@section Quoting Trickery
+
+(Note: Since @code{esh} 0.6, the backslash quote has been removed.
+Use the tilde quote instead.)
+
+Note that the meaning of the quote syntax is much different in @code{esh}
+than in Lisp -- in Lisp, the single quote is a syntactic trick to
+allow inputting lists and symbols as literals. In @code{esh}, the tilde
+quote has a very clear semantic meaning -- whenever a list is marked with
+a tilde, it is marked as such throughout it's life. Commands such as
+@code{eval} can then use this information to see which lists were supposed
+to be evaluated, and which ones were meant to be left alone.
+
+In other words, any list marked with a tilde has a numeric flag set on it,
+which is preserved on the list until the list is deleted.
+
+Also, nested tildes increase the "strength" of the tilde, so to say. 
+@code{eval} will not evaluate lists which have a "strength" greater than
+itself, and calling @code{eval} recursively will increase it's strength.
+
+This may sound confusing, but it has a simple intuitive meaning:
+
+@example
+(eval ~(foo ~(bar baz)))
+@end example
+
+Here, as you would expect, @code{eval} will only evaluate @code{foo}, and
+pass @code{(bar baz)} as a list to @code{foo}.
+
+Note that unlike in Lisp, @code{esh} has no "special forms"! A command
+that works on lists is indistinguishable from a command that works
+on code. That's why there is no @code{lambda} command, and also why
+arguments to @code{if} and firends need to be quoted with a tilde.
+
+
+@node Command List, Tutorial, Quoting Trickery, Details
+@cindex Command list
+@cindex Builtin command list, detailed
+@findex alias
+@findex alias-hash
+@findex alive?
+@findex and
+@findex begin
+@findex begin-last
+@findex car
+@findex car-l
+@findex cdr
+@findex chars
+@findex chop!
+@findex chop-nl!
+@findex clone
+@findex copy
+@findex define
+@findex defined?
+@findex exec
+@findex exit
+@findex false
+@findex file-open
+@findex file-read
+@findex file-type
+@findex file-write
+@findex filter
+@findex first
+@findex first-l
+@findex gobble
+@findex hash-get
+@findex hash-keys
+@findex hash-make
+@findex hash-put
+@findex help
+@findex interactive?
+@findex l-stack
+@findex newline
+@findex not
+@findex not-null?
+@findex nl
+@findex null
+@findex null?
+@findex match
+@findex or
+@findex parse
+@findex pop
+@findex prompt
+@findex push
+@findex read
+@findex repeat
+@findex rest
+@findex reverse
+@findex rot
+@findex script
+@findex split
+@findex squish
+@findex stack
+@findex standard
+@findex stderr
+@findex stderr-handler
+@findex substring?
+@findex top
+@findex true
+@findex typecheck
+@findex unlist
+@findex version
+@findex void
+@findex while
+@section Command List
+
+@itemize @bullet
+
+@item 
+@code{(alias <string> <string>...)} 
+Create an alias. The first argument is the name of the alias, and the
+rest of the arguments is the expansion. For example, @code{(alias rm rm -i)}
+will create an alias called @code{rm}, so that any time @code{rm} is run,
+@code{rm -i} gets executed in actuality.
+
+@item
+@code{(alias <string> <list>...)}
+Mimic an executable with a command. Whenever an executable named by
+the first string is run, the lists following get evaluated, and 
+their output is thrown away. This process will only happen during the
+parsing stage, though. That is, this type of alias will only be enabled
+when typing commands interactively into te shell.
+Example: @code{(alias cd ~(cd (stack)))} to mimic the
+traditional syntax of @code{cd}.
+
+@item
+@code{(alias-hash)}
+Return the alias hash table. Modifying this table also modifies the
+actual aliases.
+
+@item
+@code{(alive? <PID>)}
+Return @code{true} if the given process is alive, and @code{false} otherwise.
+
+@item
+@code{(and ...)} Return @code{false} if any of the arguments evaluate to
+@code{false}. Warning: the inputs need to be quoted with a tilde, since this
+command implements a short-circuited @code{"and"}!
+For example, @code{(and ~(under-attack) ~(launch-nukes))} is safe to use.
+If the @code{"eval"} of @code{~(under-attack)} evaluates to @code{false}
+@code{~(launch-nukes)} will never be evaluated.
+
+@item 
+@code{(begin ...)}
+Simply copy the inputs to the outputs. This command is useful when you want
+to use several commands as if they were a single command. Example:
+
+@example
+(if ~(check-me)
+    ~(begin (print-message)
+            (set-environment-magic))
+     ())
+@end example
+
+@item
+@code{(begin-last ...)} Evaluate the given arguments sequentially, and
+return the value of last argument.
+
+@example
+(if ~(not-null? (top))
+    ~(begin (push foo) 
+            (print (stack))
+            (pop))
+    ())
+@end example
+
+@item
+@code{(builtin <string> ...)} Execute the builtin command named by the
+first argument, even if this name has already been @code{define}d.
+For example, here's how to write a custom replacement for @code{cd}:
+
+@example
+(define cd
+        ~(push (squish (get HOME) "/.cdlog"))
+        ~(file-write (file-open file (top))
+                     (squish (file-read (file-open file (pop)))
+                             (stack) (nl)))
+        ~(builtin cd (stack)))
+@end example
+
+@item 
+@code{(car <list>)} Simply return the first element of the list.
+
+@item
+@code{(car-l ...)} Return the first element.
+
+@item 
+@code{(cdr <list>)} Return the elements of the list after the first one.
+
+@item
+@code{(chars <string>)} Return the charcters in the given string.
+@example
+(chars "foo bar") => 'f' 'o' 'o' ' ' 'b' 'a' 'r'
+@end example
+
+@item
+@code{(chop! <string>)} Delete the last character in the given string,
+and return the given string.
+Note: this function modifies the string in-place!
+
+@item
+@code{(chop-nl! <string>)} Like @code{chop!}, except that it only deletes
+the last character if it is a newline.
+
+@item
+@code{(clone <string> <number>)} Return the first argument X number of times,
+where X is the numeric value of the second argument.
+
+@item 
+@code{(copy)} Equivalent to @code{begin}.
+
+@item 
+@code{(define <string> ...)} Define a new command, named by the
+first argument. The rest of the arguments will be passed to @code{eval} 
+when the newly defined command is called. Example:
+
+@example
+(define print-nl
+        ~(print (stack) (nl)))
+@end example
+
+@item 
+@code{(defined? <string>)} Return @code{false} if the given string has not
+been defined as a command.
+
+@item 
+@code{(exec <list> ..)} Equivalent to @code{eval}, except that the stack will
+be set to the first argument for the duration of evaluation.
+
+@item 
+@code{(exit [number])} Exit with the given exit status, or zero if the
+command is called with no arguments.
+
+@item
+@code{(false ...)} Return @code{false}.
+
+@item
+@code{(file-open <string> <string>)} Open a file. The first argument specifies
+the type of the file, and the second the name of the file you want to open.
+Allowed values for the first argument:
+
+@itemize @bullet
+@item @code{"file"} Open a regular file for reading/writing.
+@item @code{"truncate"} Open a regular file for reading/writing, but truncate
+it first.
+@item @code{"append"} Open a regular file for reading/appending.
+@item @code{"string"} Simulate a file with a string variable. In this case,
+the name is used as the initial contents of the buffer.
+(Note: "string" files are implemented as pipes internally.)
+@end itemize
+
+This command return the file, or an empty list on error.
+
+@item 
+@code{(file-read <file>)} Read the entire file given by the argument
+into a single string, and return the string. @emph{Warning:} when reading
+the output of a pipeline, you may have to call this command several times.
+
+
+@item 
+@code{(file-type <string>)} Return a string describing what type of file
+is named by the given string. If such a file does not exist, return an empty
+list. Otherwise, one of these strings is returned:
+
+@itemize @bullet
+@item @code{"link"} File is a symbolic link.
+@item @code{"regular"} File is a regular file.
+@item @code{"directory"} File is a directory.
+@item @code{"character"} File is a character device.
+@item @code{"block"} File is a block device.
+@item @code{"pipe"} File is a FIFO pipe.
+@item @code{"socket"} File is a socket.
+@end itemize
+
+@item 
+@code{(file-write <file> <string>)} Write the second argument into the 
+first one.
+
+@item
+@code{(filter <string> <list>)} Apply the second argument to every character
+of the first argument. This command does not change the original string.
+
+@example
+(filter "string with spaces" 
+        ~(if ~(= (top) ' ')
+             '_'
+             ~(top)))
+@end example
+
+returns "string_with_spaces".
+
+
+@item 
+@code{(first <list>)} Equivalent to @code{car}.
+
+@item
+@code{(first-l ...)} Equivalent to @code{car-l}.
+
+@item 
+@code{(gobble <file> <list>...)} Equivalent to @code{run}, except that the
+output of the pipeline will be returned, as a string.
+
+
+@item 
+@code{(hash-get <hash> <string>)} Return the element in the given hash table
+corresponding to the given key.
+
+@item 
+@code{(hash-keys <hash>)} Return all the keys in the given hash table.
+
+@item 
+@code{(hash-make)} Return a new, empty hash table.
+
+@item 
+@code{(hash-put <hash> <string> ...)} Associate the arguments after the
+second one with the given key in the given hash table.
+
+@item 
+@code{(help)} Show version number and all builtin commands.
+
+@item
+@code{(interactive?)} Return @code{false} if the shell has @emph{not} been
+started interactively.
+
+@item
+@code{(l-cdr <list>)} Equivalent to @code{(list (cdr ...))}.
+
+@item
+@code{(l-rest <list>)} Equivalent to @code{l-cdr}.
+
+@item 
+@code{(l-stack)} Equivalent to @code{(list (stack))}.
+
+@item 
+@code{(newline)} Return a newline character.
+
+@item 
+@code{(nl)} Equivalent to @code{newline}.
+
+@item
+@code{(not <bool>)} Return @code{false} if the argument is @code{true}.
+
+@item
+@code{(not-null? <any>)} Return @code{false} if the argument is an empty list.
+
+@item 
+@code{(null ...)} Return an empty list.
+
+@item
+@code{(null? <any>)} Return @code{true} if the argument is an empty list.
+
+@item
+@code{(match <string> <string>)} Return @code{true} if the second argument
+matches the first. The first argument is a regular expression.
+
+@item
+@code{(or ...)} Return @code{false} if all the argument evaluate to 
+@code{false}. As with the command @code{and}, this command is also 
+short-circuited. See the description of @code{and} for an explanation of why
+arguments must be quoted with a tilde.
+
+@item 
+@code{(parse <string>)} Parse the given string as if it was typed into the 
+shell.
+
+@item 
+@code{(pop)} Excise the top element from the stack, and return it.
+
+@item 
+@code{(prompt ...)} Run the given arguments through @code{(squish (eval ...))}
+to produce the prompt. This command need only be run once.
+
+@item 
+@code{(push <any>)} Push the argument onto the stack.
+
+@item 
+@code{(read <string>)} Read a line of input from the user, using the given
+string as a prompt. Warning: this command only works if the shell is running
+interactively.
+
+@item
+@code{(repeat <string> ...)} Repeat the arguments after the first argument
+@code{n} number of times, where @code{n} is the numeric value of the first
+argument.
+
+@item 
+@code{(rest <list>)} Equivalent to @code{cdr}.
+
+@item
+@code{(reverse ...)} Return the given arguments in reverse order.
+
+@item 
+@code{(rot)} Switch the top and next-to-top elements of the stack, and return
+the element that just became the top one.
+
+@item 
+@code{(script <string>)} Execute the given filename as a shell script.
+
+@item 
+@code{(split <string>...)} Separate the given string into words. If there are
+more than one arguments given, then use the arguments after the first one as
+field separators. Otherwise, assume that fields are separated by whitespace.
+Note that splitting is more complex than you'd think at first glance --
+@code{(split ":.:.foo:.:bar.:baz." ":" ".")} @result{} @code{foo bar baz}.
+In other words, extra field separators are ignored.
+
+@item 
+@code{(squish ...)} Concatenate any string values into a single string. List
+structures will be ignored. For example: 
+@code{(squish ~(foo (bar (baz))))} @result{} @code{foobarbaz}.
+
+@item 
+@code{(stack)} Return all the stack elements, top one first.
+
+@item
+@code{(standard)} Return the standard input/output.
+
+@item
+@code{(stderr)} Return the standard input/error.
+
+@item
+@code{(stderr-handler <file>)} Define a standard error handler for
+all new subprocesses. This means that from now on, all executables run 
+from the shell will send their standard error to the given file.
+
+@item
+@code{(substring? <string> <string>)} Return @code{true} if the first argument
+is a substring of the second.
+
+@item 
+@code{(top)} Return a copy of the top element of the stack.
+
+@item
+@code{(true ...)} Return @code{true}.
+
+@item 
+@code{(typecheck <string> ...)} Make sure that the given arguments match the
+given type specification string. (@pxref{Tutorial} for a description of this
+type specification string.)
+
+@item 
+@code{(unlist <list>)} Return the elements of the given list.
+
+@item
+@code{(version)} Return the version of the shell, as three numbers.
+
+@item
+@code{(void ...)} Return nothing at all. Note: This is different from
+@code{null}! For example:
+
+@example
+(if (null (magic-sequence))
+    ~(my-predicate)
+    true
+    false)
+@end example
+
+is an error, since in this case @code{if} is given four arguments.
+(@code{null} returns an empty list.)
+
+On the other hand,
+
+@example
+(if (void (magic-sequence))
+    ~(my-predicate)
+    true
+    false)
+@end example
+
+is perfectly fine since @code{void} returns nothing at all whatsoever!
+
+@item
+@code{(while <list> <list> ...)} @code{eval} the second argument as long
+as the @code{eval} of the first argument is not @code{false}. The rest of
+the arguments are used as the stack for the duration of this command's 
+execution. @emph{Warning:} this command is an efficiency hack. It saves the 
+waste of creating a huge return value which would be inherent in a recursive 
+command. Use @code{while} only if you don't care about the return value of
+the given commands.
+
+Example:
+
+@example
+(define while-rec
+ ~(if ~(condition)
+      ~(begin (action)
+              (while-rec))
+      ()))
+@end example
+
+will return a value equivalent to @code{(action) (action) (action) ...}.
+This value could be a large memory and time waste. Therefore, when you are
+looping over large lists and you don't care about return values, use
+@code{while}.
+
+
+@end itemize
+
+@node Tutorial,     , Command List, Details
+@cindex Tutorial
+@cindex Examples
+@cindex Sample code
+@cindex Typechecking
+@findex typecheck
+@findex prompt
+@findex for-each
+@findex file-read
+@findex file-write
+@section Tutorial
+
+For starters, let us write a simple command to iterate through a list:
+
+@example
+(define for-each
+        ~(if ~(not-null? (rot))
+             ~(begin ((rot) (rot))
+                     (for-each (cdr (list (stack)))))
+             ()))
+@end example
+
+Using this command is simple:
+
+@example
+(define starrify 
+        ~(squish '*' (top) '*'))
+
+(for-each starrify foo bar baz)
+@end example
+
+results in @code{*foo* *bar* *baz*}.
+
+Several notes to keep in mind: notice the tricky use of @code{rot} to
+shuffle stack elements. If you don't remember, @code{rot} switches the top
+and the next-to-top elements of the stack, and returns a copy of the element 
+that just became the top one.
+
+Think of it as such: the first call to @code{rot} brings the second argument
+to the front and checks that the stack is not empty, at the same time.
+
+The second call to @code{rot} returns the first argument, and the third
+call to @code{rot} returns the second element and undoes the previous call
+of @code{rot} at the same time. At this point, the second argument is still
+on top of the stack.
+
+Finally, when @code{for-each} is recursively called, it is given only
+below the top stack element as arguments. Effectively, the second element
+was excised from the stack.
+
+Also note that @code{((rot) (rot))} is calling a command, even though the
+name of the command is not explicit.
+
+Now for another example. Suppose that you want to remind yourself which
+directory serves which purpose, and you'd like a descriptive string to
+be listed along with a directory name in the prompt. 
+(i.e. @code{[/home/ivan/src/xcf => Backup of GIMP artwork]$ })
+
+@example
+(prompt ~(push (get PWD))
+        ~(push (hash-get (dir-names) (top)))
+        "["
+        ~(rot)
+        ~(if ~(not-null? (rot))
+             ~(squish " => " (top))
+             "")
+        "]$ "
+        ~(null (pop))
+        ~(null (pop)))
+@end example
+
+The meaning of @code{prompt} is simple -- whatever arguments are given to
+it are passed through @code{eval} and @code{squish} to become the string
+specifying the prompt. Again, as far as quoting is concerned, @code{prompt}
+is identical to @code{eval}.
+
+Also, the command @code{null} simply returns an empty list.
+
+To finish the job, you should insert the following code into your 
+@code{.eshrc}:
+
+@example
+(define dir-names (hash-make))
+
+(hash-put (dir-names) "/home/ivan/src/xcf" "Backup of GIMP artwork")
+@end example
+
+
+This is a simple script that illustrates simple file I/O:
+
+@example
+(define prepend
+  ~(push (file-read (file-open file (pop))))
+  ~(push (squish (pop)
+                 (file-read (file-open file (top)))))
+  ~(file-write (file-open truncate (rot)) (rot)))
+@end example
+
+A script such as this was used to append a header to every source code file
+in the @code{esh} distribution. Note the @code{typecheck} command; it is
+very useful for insuring the consistency of arguments to commands.
+
+The only tricky part about using @code{typecheck} is the syntax of the
+first argument. Here is an explanation:
+
+@itemize @bullet
+@item @code{s} Make sure that the next argument is a single string.
+@item @code{l} Make sure that the next argument is a single list.
+@item @code{h} Make sure that the next argument is a single hash table.
+@item @code{b} Make sure that the next argument is a single boolean.
+@item @code{f} Make sure that the next argument is a single file.
+@item @code{p} Make sure that the next argument is a PID.
+@item @code{S} Match any number of strings.
+@item @code{L} Match any number of lists.
+@item @code{H} Match any number of hash tables.
+@item @code{B} Match any number of booleans.
+@item @code{F} Match any number of files.
+@item @code{P} Match any number of PID's.
+@item @code{?} Match any one element.
+@item @code{*} Match any number of any elements.
+@item @code{(} Match a list only if the sublist passes typechecking on the
+               string after the parentheses.
+@item @code{)} Match end-of-list.
+@end itemize
+
+For example, @code{"H(ss)s"} will match any list of arguments that begin
+with an arbitrary number of hash tables, followed by a list of two strings,
+and ends with a single string.
+
+
+@node     Differences from Scheme, Differences from sh, Details, Top
+@cindex Differences from Scheme
+@cindex Scheme
+@cindex Lisp
+@cindex Differences
+@chapter Differences from Scheme
+
+
+Note that in @code{esh} there is no numeric or "symbol" type -- all scalars are
+either strings, booleans, files, or process ID's. Most importantly, 
+there is no "procedure" type -- hence, no @code{lambda} command. From the point
+of view of the interpreter, a command and a list are indistinguishable.
+
+Don't be mislead by the naming of @code{define} -- it is actually equivalent to
+a Lisp-like macro definition. 
+
+Also, @code{car} and friends are more complicated because commands in 
+@code{esh}
+can return any number of arguments. This is why @code{(car (split "foo bar"))}
+doesn't work -- @code{car} expects a list, while @code{split} returns 
+an arbitrary number of elements. In a case like this, it is more convenient
+to write @code{(car-l (split "foo bar"))} instead, which is equivalent
+to @code{(car (list (split "foo bar")))}.
+
+@node     Differences from sh, Command Index, Differences from Scheme, Top
+@cindex Differences from sh
+@cindex Differences
+@cindex bash
+@cindex csh
+@cindex sh
+@cindex tcsh
+@chapter Differences from sh
+
+The most obvious difference is the syntax -- other shells normally don't
+make much of a distinction between commands from a disk executable and
+the shell interpreter's builtin commands. Not so in @code{esh}. 
+While other shell normally operate by complicated string substitution
+and matching rules, @code{esh} mainly uses command definitions and 
+recursion. In that sense, it is more similar to a "real" programming 
+language. @code{esh} also supports more complicated data structures --
+lists and hash tables, for example. However, string operations are
+lacking in comparison to other shells. 
+
+@code{esh} is also more verbose and formal, though this could be beneficial 
+when you're trying to compose large libraries of useful routines.
+(It's possible to write shell "modes", much as in @code{emacs}, when using
+@code{esh}.)
+
+@code{esh} has a more generalized support for files. Instead of limiting
+file I/O to redirection only, the same commands can be used either on pipes
+or on files directly. (e.g. in the future, it may be possible to use a 
+network socket as the output of a pipeline.)
+
+Also, traditional shells have "exported" and "non-exported" environment
+variables, whereas in @code{esh} all variables are exported. That is,
+there's no @code{setenv} command, there's just @code{set}.
+
+@node     Command Index, Concept Index, Differences from sh, Top
+@unnumbered Command Index
+
+@printindex fn
+
+@node     Concept Index,     , Command Index, Top
+@unnumbered Concept Index
+
+@printindex cp
+
+@contents
+@bye
+

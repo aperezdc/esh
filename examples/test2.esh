@@ -1,0 +1,14 @@
+
+(define stacker 
+  ~(if ~(not-null? (top))
+       ~(begin (pop) (stacker (stack)))
+       ()))
+       
+
+(print (stacker hello world this is not an
+		exhaustive test of the memory leakiness of esh) (nl))
+
+
+
+
+

@@ -1,0 +1,16 @@
+
+# Note: if you are operating on large lists and you don't care about
+# return values, you're better off using "while" instead.
+
+(define for-each
+  ~(if ~(not-null? (rot))
+       ~(begin ((rot) (rot))
+	       (for-each (cdr (l-stack))))
+       ()))
+
+
+(define starrify
+  ~(squish * (top) *))
+
+(print (for-each starrify foo bar baz) (nl))
+

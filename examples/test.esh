@@ -1,0 +1,11 @@
+(run-simple ~(echo 'File list:'))
+(run-simple ~(ls --color=yes))
+(print (nl) (nl))
+(alias ls ls --color=yes)
+(run-simple ~(ls))
+(run-simple ~(less LICENSE))
+(copy oops this does nothing)
+(bg)
+(jobs)
+(cd ..)
+

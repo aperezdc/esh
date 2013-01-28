@@ -1,0 +1,17 @@
+
+#
+# This file demonstrates what the point of bold.c is, and some very
+# handy tricks with files.
+#
+# Namely, this will cause the standard error to be printed in bold red
+# on the terminal.
+#
+# The only problem with this is that it causes `less' to behave very
+# strangely, but this seems to be a bug in `less'. 
+#
+
+(push (file-open string ''))
+(run (true) (top) (stderr) ~(bold))
+(stderr-handler (pop))
+
+

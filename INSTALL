@@ -1,0 +1,27 @@
+(Note: you can download a binary RPM for RedHat from 
+ftp://ftp.falsehope.com/pub/esh/
+Thanks to Ryan Weaver for it.)
+
+
+1. Edit the Makefile to set compilation flags and header locations.
+   Pay attention to the "INC=..." and "LIB=..." lines; that's where you
+   put the location of your readline library.
+
+   Note: If you get linking errors, something along the lines of
+   "tputs" and "tgetflag" missing, try compiling with "-ltermcap" in the
+   "LIB=" line. This seems to be an idiosyncracy of readline -- if someone
+   can clue me in why some compilations of readline need this, I'll be
+   greatful.
+
+   Note that the size of the executable triples on my Linux/glibc
+   system when compiled with debugging, so you might want to turn it off.
+
+2. Type "make".
+
+3. Copy "esh" to anywhere you want to install the shell. The shell does
+   not depend on any other files.
+   
+4. The directory "emacs" contains an emacs editing mode for shell scripts.
+   The directory "examples" contains some example shell scripts.
+   The directory "doc" has the info and html documentation.
+

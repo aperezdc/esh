@@ -1,0 +1,39 @@
+
+
+# Here's a simple demonstration of interprocess communication.
+# It is a double-ended pipe, with 'sort' in between as a filter.
+#
+# Note that the pipe is asynchronous! Unless you have some sort
+# of protocol to guide you, you don't know for sure if the subprocess
+# is done writing or merely taking a long time to finish. 
+#
+# That's why we need to wait a bit before reading back from the pipe -- 
+# 'sort' needs a bit of time to finish it's job.
+#
+# Also, this script would have been much easier and safer had we used
+# "gobble" instead of "run".
+
+(push "
+Foo
+Bar
+baz
+Zoop
+Goop
+whee
+you
+we
+arg
+Grunt
+abc")
+
+(push (file-open s ''))
+
+# Alternatively, simply use this instead of "run":
+# (push (gobble (file-open s (rot)) ~(sort)))
+
+(run (true) (file-open s (rot)) (rot) ~(sort))
+(wait 1)
+(push (file-read (pop)))
+
+(print 'Sorted output:' (nl) (top) (nl))
+
