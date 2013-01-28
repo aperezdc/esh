@@ -44,6 +44,18 @@ depend:
 
 .PHONY: depend
 
+
+doc: doc/esh.info doc/esh.html
+doc/esh.html: doc/esh.texi
+	texi2html --subdir=doc/ $<
+
+clean-doc:
+	$(RM) doc/esh.html doc/esh_toc.html doc/esh.info
+
+.PHONY: doc clean-doc
+
+mrproper: clean clean-doc
+
 # DO NOT DELETE
 
 list.o: gc.h list.h hash.h
