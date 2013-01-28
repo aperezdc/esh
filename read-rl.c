@@ -31,7 +31,7 @@ static char* dynamic_strcpy_malloc(char* str) {
   return tmp;
 }
 
-static char* rl_find_builtin(char* word, int state) {
+static char* rl_find_builtin(const char* word, int state) {
   static int len = 0;
   static list* hash_ls1 = NULL;
   static list* hash_ls2 = NULL;
@@ -83,7 +83,7 @@ static char* rl_find_builtin(char* word, int state) {
   }
 }
 
-static char** rl_esh_completion(char* word, int start, int end) {
+static char** rl_esh_completion(const char* word, int start, int end) {
 
   /* If the first non-whitespace character before the word is an
    * open parentheses, then complete a command. Otherwise, fallback to
@@ -98,7 +98,7 @@ static char** rl_esh_completion(char* word, int start, int end) {
   }
 
   if (openparen(rl_line_buffer[start])) {
-    return completion_matches(word, rl_find_builtin);
+    return rl_completion_matches(word, rl_find_builtin);
 
   } else {
     return NULL;
