@@ -1587,7 +1587,6 @@ void init_shell(int argc, char** argv) {
 int main(int argc, char** argv, char** env) {
   char* pmt;
   char* line = NULL;
-  list* tmp = NULL;
 
   environ = env;
   init_shell(argc, argv);
