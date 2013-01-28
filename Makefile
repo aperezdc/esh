@@ -1,48 +1,46 @@
-
-# Your C compiler.
-
-CC=gcc
+#
+# Flags to the compiler:
+#
+#   MEM_DEBUG          Check for memory leaks.
+#
+#DEFINES += MEM_DEBUG
 
 # Where your readline library is.
 # You can compile with a "gets()" replacement instead.
 
-#INC=
-#LIB=
-#READ=read-stdio
+#READ      = read-stdio
+READ     ?= read-rl
 
-INC=-I/usr/include/readline
-LIB= -lncurses -lreadline
-READ=read-rl
+INCLUDES += /usr/include/readline
+LIB      += -lncurses -lreadline
 
-# Flags to the compiler: 
-#
-# -DMEM_DEBUG          Check for memory leaks.
-#
+# No need to change things from this point onwards
 
-CFLAGS += -Wall $(INC)
+CFLAGS   += -Wall
+DEFINES  := $(patsubst %,-D%,$(DEFINES))
+INCLUDES := $(patsubst %,-I%,$(INCLUDES))
+CPPFLAGS += $(DEFINES) $(INCLUDES)
 
-# No need to change this stuff.
+OBJS := list.o hash.o builtins.o esh.o format.o gc.o $(READ).o
+VERS := 0.8.5
 
-OBJS=list.o hash.o builtins.o esh.o format.o gc.o $(READ).o
-VERS=0.8.5
+all: esh
 
-all: $(OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIB) -o esh
-
-backup:
-	cp -f Makefile *.[ch] /home/backup/esh
+esh: $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ $(LIB) -o esh
 
 clean:
-	-rm *~ */*~ *.o core bold esh gmon.out
+	$(RM) $(OBJS) esh
 
 dist:
-	-rm esh*tar.gz
-	cd ..; tar -c esh/* > esh/esh-$(VERS).tar
-	gzip esh-$(VERS).tar
+	git archive --prefix=esh-$(VERS)/ v$(VERS) | xz -9c > esh-$(VERS).tar.xz
+
+.PHONY: dist
 
 depend:
 	makedepend -Y $(OBJS:.o=.c) read*.c
 
+.PHONY: depend
 
 # DO NOT DELETE
 
