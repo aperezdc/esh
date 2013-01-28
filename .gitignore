@@ -1,0 +1,7 @@
+*.sw[op]
+*.bak
+*.elc
+*.o
+*.so
+bold
+esh
