@@ -98,7 +98,7 @@ static char** rl_esh_completion(const char* word, int start, int end) {
   }
 
   if (openparen(rl_line_buffer[start])) {
-    return rl_completion_matches(word, rl_find_builtin);
+    return rl_completion_matches(word, (rl_compentry_func_t *)rl_find_builtin);
 
   } else {
     return NULL;
@@ -109,7 +109,7 @@ void read_init(void) {
   rl_bind_key('\012', rl_literal_newline);
 
   /* rl_catch_signals = 0; */
-  rl_attempted_completion_function = rl_esh_completion;
+  rl_attempted_completion_function = (rl_completion_func_t *)rl_esh_completion;
 }
 
 char* read_read(char* prompt) {

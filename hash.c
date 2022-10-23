@@ -147,7 +147,7 @@ void hash_init(hash_table* _hash_array, hash_entry data[]) {
 }
 
 void hash_free(hash_table* tab,
-	       void (*func)()) {
+	       void (*func)(void*  data)) {
   int i;
   list* iter;
 
